@@ -197,7 +197,8 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
       exportEnabled: true,
       animationEnabled: true,
       title: {
-        text: "Covid-19 statewise"
+        text: "Covid-19 statewise",
+        fontSize: 22
       },
       legend: {
         cursor: "pointer",
@@ -225,56 +226,80 @@ function explodePie(e) {
 
 }
 
-// window.onload = function () {
-//   axios.get('https://api.rootnet.in/covid19-in/stats/daily')
-//     .then(response => {
-//       const total = [], indian = [], foreigner = [];
-//       response.data.data.map(day => {
-//         console.log(day);
-//         total.push({ x: day.day, y: day.total });
-//         indian.push({ x: day.day, y: day.confirmedCasesIndian })
-//         foreigner.push({ x: day.day, y: day.confirmedCasesForeign })
-//       })
-//       var chart = new CanvasJS.Chart("chartContainer", {
-//         animationEnabled: true,
-//         title: {
-//           text: "Daily Report of covid-19"
-//         },
-//         axisX: {
-//           valueFormatString: "DDD",
-//           minimum: new Date(2020, 10, 03, 23),
-//           maximum: new Date(2020, 03, 31, 1)
-//         },
-//         axisY: {
-//           title: "No. of people"
-//         },
-//         legend: {
-//           verticalAlign: "top",
-//           horizontalAlign: "right",
-//           dockInsidePlotArea: true
-//         },
-//         toolTip: {
-//           shared: true
-//         },
-//         data: [{
-//           name: "Received",
-//           showInLegend: true,
-//           legendMarkerType: "square",
-//           type: "area",
-//           color: "rgba(40,175,101,0.6)",
-//           markerSize: 0,
-//           dataPoints: indian
-//         },
-//         {
-//           name: "Sent",
-//           showInLegend: true,
-//           legendMarkerType: "square",
-//           type: "area",
-//           color: "rgba(0,75,141,0.7)",
-//           markerSize: 0,
-//           dataPoints: total
-//         }]
-//       });
-//       chart.render();
-//     })
-// }
+window.onload = function () {
+  axios.get('https://api.rootnet.in/covid19-in/stats/daily')
+    .then(response => {
+      const total = [], indian = [], foreigner = [], death = [], discharged = [];
+      response.data.data.map((day, index) => {
+        // console.log(index)
+        if (index !== 0) {
+          total.push({ x: new Date(day.day), y: day.summary.total - response.data.data[index - 1].summary.total });
+          indian.push({ x: new Date(day.day), y: day.summary.confirmedCasesIndian - response.data.data[index - 1].summary.confirmedCasesIndian + day.summary.confirmedButLocationUnidentified })
+          foreigner.push({ x: new Date(day.day), y: day.summary.confirmedCasesForeign - response.data.data[index - 1].summary.confirmedCasesForeign })
+          death.push({ x: new Date(day.day), y: day.summary.deaths - response.data.data[index - 1].summary.deaths })
+          discharged.push({ x: new Date(day.day), y: day.summary.discharged - response.data.data[index - 1].summary.discharged })
+        } else {
+          total.push({ x: new Date(day.day), y: day.summary.total });
+          indian.push({ x: new Date(day.day), y: day.summary.confirmedCasesIndian + day.summary.confirmedButLocationUnidentified })
+          foreigner.push({ x: new Date(day.day), y: day.summary.confirmedCasesForeign })
+          death.push({ x: new Date(day.day), y: day.summary.deaths })
+          discharged.push({ x: new Date(day.day), y: day.summary.discharged })
+        }
+      })
+      var chart = new CanvasJS.Chart("chartContainer1", {
+        animationEnabled: true,
+        title: {
+          text: "Daily Wise New cases in India",
+          fontSize: 22
+        },
+        axisY: {
+          includeZero: false,
+          prefix: ""
+        },
+        toolTip: {
+          shared: true
+        },
+        legend: {
+          fontSize: 13
+        },
+        data: [{
+          type: "line",
+          showInLegend: true,
+          name: "Total new cases",
+          yValueFormatString: "#,##0",
+          xValueFormatString: "MMM YYYY",
+          dataPoints: total
+        },
+        {
+          type: "line",
+          showInLegend: true,
+          name: "Indian new Cases",
+          yValueFormatString: "#,##0",
+          dataPoints: indian
+        },
+        {
+          type: "line",
+          showInLegend: true,
+          yValueFormatString: "#,##0",
+          name: "Foreigner new cases",
+          dataPoints: foreigner
+        },
+        {
+          type: "line",
+          showInLegend: true,
+          yValueFormatString: "#,##0",
+          name: "Deaths",
+          dataPoints: death
+        },
+        {
+          type: "line",
+          showInLegend: true,
+          yValueFormatString: "#,##0",
+          name: "Discharged persons",
+          dataPoints: discharged
+        }
+        ]
+      });
+      chart.render();
+    })
+}
