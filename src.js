@@ -6,13 +6,13 @@ var path = d3.geoPath()
   .projection(projection)
   .pointRadius(2);
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#map").append("svg")
   .attr("width", width)
   .attr("height", height);
 
 var g = svg.append("g"),
   tooltip = d3
-    .select("body")
+    .select("#map")
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 1),
@@ -163,8 +163,26 @@ function colorSubunits(subunits) {
 
 axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewise")
   .then(data => {
-    const stateData = data.data.data.statewise;
+    var stateData = data.data.data.statewise;
+    stateData = stateData.sort();
+    const total = data.data.data.total;
+    document.getElementById('india-total-data').innerHTML = `<tr>
+    <td>${total.confirmed}</td>
+    <td>${total.active}</td>
+    <td>${total.recovered}</td>
+    <td>${total.deaths}</td>
+  </tr>`
+    var stateWiseData = ''
     stateData.forEach(data => {
       casesByState[data.state] = { confirmed: data.confirmed, recovered: data.recovered, deaths: data.deaths, active: data.active }
+      stateWiseData += `<tr>
+      <td>${data.state}</td>
+      <td>${data.confirmed}</td>
+      <td>${data.active}</td>
+      <td>${data.recovered}</td>
+      <td>${data.deaths}</td>
+    </tr>`
     })
+    console.log(stateWiseData)
+    document.getElementById('india-states-cases').innerHTML = stateWiseData;
   })

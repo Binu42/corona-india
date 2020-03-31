@@ -1,67 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <style>
-    body {
-      font-family: "Helvetica Neue", sans-serif;
-      margin: 0;
-      background-color: #fff1f1;
-    }
-
-    div.tooltip {
-      position: absolute;
-      padding: 5px 10px;
-      color: black;
-      border-radius: 4px;
-      font: 12px sans-serif;
-      background: white;
-      border: 1px solid black;
-      pointer-events: none;
-      width: 200px;
-    }
-
-    .tipps {
-      background-color: #e3eef1;
-      border-radius: 1rem;
-      margin-top: 2rem;
-      margin-bottom: 2rem;
-      padding: 2rem;
-      color: black;
-      font-family: GrotekMed;
-      -webkit-box-shadow: 0 0 40px 0 rgba(0, 0, 0, 0.15);
-    }
-
-    table {
-      width: 100%;
-      border: 1px dashed #333333;
-    }
-
-    thead {
-      background-color: #0213ff;
-      color: white;
-    }
-
-    th,
-    td {
-      vertical-align: center;
-      text-align: center;
-      padding: 5px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      font-size: 16px;
-    }
-
-    td {
-      font-size: 16px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>covid-19 india</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <div id="india-cases">
+    <table>
+      <thead>
+        <tr>
+          <th>Total Cases</th>
+          <th>Total Active Cases</th>
+          <th>Recovered</th>
+          <th>Deaths</th>
+        </tr>
+      </thead>
+      <tbody id="india-total-data"></tbody>
+    </table>
+  </div>
   <div id="map"></div>
+  <h1 style="text-align: center; text-decoration: underline;">Statewise Cases in India</h1>
+  <div id="india-statewise-cases">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>Total</th>
+          <th>Active</th>
+          <th>Recovered</th>
+          <th>Death</th>
+        </tr>
+      </thead>
+      <tbody id="india-states-cases"></tbody>
+    </table>
+  </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"
     integrity="sha256-T/f7Sju1ZfNNfBh7skWn0idlCBcI3RwdLSS4/I7NQKQ=" crossorigin="anonymous"></script>
   <script src="https://d3js.org/d3.v4.min.js"></script>
