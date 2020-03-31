@@ -1,8 +1,10 @@
 body {
   font-family: 'Helvetica Neue', sans-serif;
   margin: 0;
+  padding: 0;
+  box-sizing: content-box;
   background-color: #fff1f1;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 }
 
 path.subunit:hover {
@@ -32,7 +34,7 @@ div.tooltip {
 }
 
 table {
-  width: 100%;
+  width: calc(100% - 80px);
   border-collapse: collapse;
 }
 
@@ -101,9 +103,12 @@ table.table td {
 }
 
 #india-statewise-cases {
-  margin: 25px;
-  padding: 20px;
-  border-radius: 5px;
+  padding: 10px 40px;
+  min-width: 300px;
+  max-width: 900px;
+  max-height: 600px;
+  margin: auto;
+  margin-bottom: 20px;
   background-color: #e2e0e0;
   box-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.034),
     0 6.7px 5.3px rgba(0, 0, 0, 0.048), 0 12.5px 10px rgba(0, 0, 0, 0.06),
@@ -111,10 +116,10 @@ table.table td {
     0 100px 80px rgba(0, 0, 0, 0.12);
 }
 
-#india-statewise-cases table {
-  overflow: scroll;
-}
-
 #india-statewise-cases tr {
   border-bottom: 1px dashed coral;
+}
+
+#map {
+  margin: auto;
 }

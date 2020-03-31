@@ -1,4 +1,4 @@
-var width = window.innerWidth, height = window.innerHeight;
+var width = window.innerWidth - window.innerWidth / 90, height = window.innerHeight;
 
 var projection = d3.geoMercator();
 
@@ -66,17 +66,17 @@ function drawPlaces(data) {
     .attr("d", path)
     .attr("class", "place");
 
-  g.selectAll(".place-label")
-    .data(topojson.feature(data, data.objects.places).features)
-    .enter().append("text")
-    .attr("class", "place-label")
-    .attr("transform", function (d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
-    .attr("dy", ".35em")
-    .attr("x", 6)
-    .attr("text-anchor", "start")
-    .style("font-size", ".7em")
-    .style("text-shadow", "0px 0px 2px #fff")
-    .text(function (d) { return d.properties.name; });
+  // g.selectAll(".place-label")
+  //   .data(topojson.feature(data, data.objects.places).features)
+  //   .enter().append("text")
+  //   .attr("class", "place-label")
+  //   .attr("transform", function (d) { return "translate(" + projection(d.geometry.coordinates) + ")"; })
+  //   .attr("dy", ".35em")
+  //   .attr("x", 6)
+  //   .attr("text-anchor", "start")
+  //   .style("font-size", ".7em")
+  //   .style("text-shadow", "0px 0px 2px #fff")
+  // .text(function (d) { return d.properties.name; });
 
 }
 
@@ -124,8 +124,8 @@ function drawSubUnits(data) {
         </tr>
       </tbody>
     </table></div>`)
-        .style("left", d3.event.pageX + 20 + "px")
-        .style("top", d3.event.pageY - 48 + "px");
+        .style("top", (event.pageY) + "px")
+        .style("left", (event.pageX - 100) + "px");
     })
     .on("mouseout", function (t) {
       tooltip
