@@ -175,8 +175,13 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
     <td>${total.recovered}</td>
     <td>${total.deaths}</td>
   </tr>`
-    var stateWiseData = ''
-    stateData.forEach(data => {
+    var stateWiseData = '', report = [];
+    stateData.forEach((data, index) => {
+      if (index === 0) {
+        report.push({ name: data.state, y: Math.round((data.confirmed / total.confirmed) * 100), exploded: true })
+      } else {
+        report.push({ name: data.state, y: Math.round((data.confirmed / total.confirmed) * 100) })
+      }
       casesByState[data.state] = { confirmed: data.confirmed, recovered: data.recovered, deaths: data.deaths, active: data.active }
       stateWiseData += `<tr>
       <td>${data.state}</td>
@@ -186,6 +191,90 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
       <td>${data.deaths}</td>
     </tr>`
     })
-    console.log(stateWiseData)
+    // console.log(stateWiseData)
     document.getElementById('india-states-cases').innerHTML = stateWiseData;
+    var chart = new CanvasJS.Chart("chartContainer", {
+      exportEnabled: true,
+      animationEnabled: true,
+      title: {
+        text: "Covid-19 statewise"
+      },
+      legend: {
+        cursor: "pointer",
+        itemclick: explodePie
+      },
+      data: [{
+        type: "pie",
+        showInLegend: true,
+        toolTipContent: "{name}: <strong>{y}%</strong>",
+        indexLabel: "{name} - {y}%",
+        dataPoints: report
+      }]
+    });
+    chart.render();
   })
+
+
+function explodePie(e) {
+  if (typeof (e.dataSeries.dataPoints[e.dataPointIndex].exploded) === "undefined" || !e.dataSeries.dataPoints[e.dataPointIndex].exploded) {
+    e.dataSeries.dataPoints[e.dataPointIndex].exploded = true;
+  } else {
+    e.dataSeries.dataPoints[e.dataPointIndex].exploded = false;
+  }
+  e.chart.render();
+
+}
+
+// window.onload = function () {
+//   axios.get('https://api.rootnet.in/covid19-in/stats/daily')
+//     .then(response => {
+//       const total = [], indian = [], foreigner = [];
+//       response.data.data.map(day => {
+//         console.log(day);
+//         total.push({ x: day.day, y: day.total });
+//         indian.push({ x: day.day, y: day.confirmedCasesIndian })
+//         foreigner.push({ x: day.day, y: day.confirmedCasesForeign })
+//       })
+//       var chart = new CanvasJS.Chart("chartContainer", {
+//         animationEnabled: true,
+//         title: {
+//           text: "Daily Report of covid-19"
+//         },
+//         axisX: {
+//           valueFormatString: "DDD",
+//           minimum: new Date(2020, 10, 03, 23),
+//           maximum: new Date(2020, 03, 31, 1)
+//         },
+//         axisY: {
+//           title: "No. of people"
+//         },
+//         legend: {
+//           verticalAlign: "top",
+//           horizontalAlign: "right",
+//           dockInsidePlotArea: true
+//         },
+//         toolTip: {
+//           shared: true
+//         },
+//         data: [{
+//           name: "Received",
+//           showInLegend: true,
+//           legendMarkerType: "square",
+//           type: "area",
+//           color: "rgba(40,175,101,0.6)",
+//           markerSize: 0,
+//           dataPoints: indian
+//         },
+//         {
+//           name: "Sent",
+//           showInLegend: true,
+//           legendMarkerType: "square",
+//           type: "area",
+//           color: "rgba(0,75,141,0.7)",
+//           markerSize: 0,
+//           dataPoints: total
+//         }]
+//       });
+//       chart.render();
+//     })
+// }
