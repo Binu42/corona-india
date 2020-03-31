@@ -193,6 +193,7 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
     })
     // console.log(stateWiseData)
     document.getElementById('india-states-cases').innerHTML = stateWiseData;
+    // plotting graph for percentage each state contribute in total cases...
     var chart = new CanvasJS.Chart("chartContainer", {
       exportEnabled: true,
       animationEnabled: true,
@@ -202,6 +203,7 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
       },
       legend: {
         cursor: "pointer",
+        fontSize: 14,
         itemclick: explodePie
       },
       data: [{
@@ -229,23 +231,44 @@ function explodePie(e) {
 window.onload = function () {
   axios.get('https://api.rootnet.in/covid19-in/stats/daily')
     .then(response => {
-      const total = [], indian = [], foreigner = [], death = [], discharged = [];
+      const newTotalCases = [], newIndianCases = [], newForeignerCases = [], newDeathCases = [], newDischargedCases = [], totalCases = [], totalRecovered = [], totalDeath = [], todayCases = [];
       response.data.data.map((day, index) => {
         // console.log(index)
         if (index !== 0) {
-          total.push({ x: new Date(day.day), y: day.summary.total - response.data.data[index - 1].summary.total });
-          indian.push({ x: new Date(day.day), y: day.summary.confirmedCasesIndian - response.data.data[index - 1].summary.confirmedCasesIndian + day.summary.confirmedButLocationUnidentified })
-          foreigner.push({ x: new Date(day.day), y: day.summary.confirmedCasesForeign - response.data.data[index - 1].summary.confirmedCasesForeign })
-          death.push({ x: new Date(day.day), y: day.summary.deaths - response.data.data[index - 1].summary.deaths })
-          discharged.push({ x: new Date(day.day), y: day.summary.discharged - response.data.data[index - 1].summary.discharged })
+          newTotalCases.push({ x: new Date(day.day), y: day.summary.total - response.data.data[index - 1].summary.total });
+          newIndianCases.push({ x: new Date(day.day), y: day.summary.confirmedCasesIndian - response.data.data[index - 1].summary.confirmedCasesIndian + day.summary.confirmedButLocationUnidentified - response.data.data[index - 1].summary.confirmedButLocationUnidentified })
+          newForeignerCases.push({ x: new Date(day.day), y: day.summary.confirmedCasesForeign - response.data.data[index - 1].summary.confirmedCasesForeign })
+          newDeathCases.push({ x: new Date(day.day), y: day.summary.deaths - response.data.data[index - 1].summary.deaths })
+          newDischargedCases.push({ x: new Date(day.day), y: day.summary.discharged - response.data.data[index - 1].summary.discharged })
         } else {
-          total.push({ x: new Date(day.day), y: day.summary.total });
-          indian.push({ x: new Date(day.day), y: day.summary.confirmedCasesIndian + day.summary.confirmedButLocationUnidentified })
-          foreigner.push({ x: new Date(day.day), y: day.summary.confirmedCasesForeign })
-          death.push({ x: new Date(day.day), y: day.summary.deaths })
-          discharged.push({ x: new Date(day.day), y: day.summary.discharged })
+          newTotalCases.push({ x: new Date(day.day), y: day.summary.total });
+          newIndianCases.push({ x: new Date(day.day), y: day.summary.confirmedCasesIndian + day.summary.confirmedButLocationUnidentified })
+          newForeignerCases.push({ x: new Date(day.day), y: day.summary.confirmedCasesForeign })
+          newDeathCases.push({ x: new Date(day.day), y: day.summary.deaths })
+          newDischargedCases.push({ x: new Date(day.day), y: day.summary.discharged })
+        }
+        totalCases.push({ x: new Date(day.day), y: day.summary.total });
+        totalRecovered.push({ x: new Date(day.day), y: day.summary.discharged });
+        totalDeath.push({ x: new Date(day.day), y: day.summary.deaths })
+      })
+
+      const latestReport = response.data.data[response.data.data.length - 1].regional.sort(function (a, b) {
+        return b.confirmedCasesIndian - a.confirmedCasesIndian;
+      });
+      const previousDayReport = response.data.data[response.data.data.length - 2].regional.sort(function (a, b) {
+        return b.confirmedCasesIndian - a.confirmedCasesIndian;
+      });
+      // console.log(latestReport, previousDayReport);
+      latestReport.map((state, index) => {
+        const prevDayMatch = previousDayReport.find(statePrev => statePrev.loc === state.loc);
+        if (index === 0) {
+          todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)), exploded: true })
+        } else {
+          todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)) })
         }
       })
+      // console.log(todayCases)
+      // plotting graph for daily wise total cases....
       var chart = new CanvasJS.Chart("chartContainer1", {
         animationEnabled: true,
         title: {
@@ -267,39 +290,104 @@ window.onload = function () {
           showInLegend: true,
           name: "Total new cases",
           yValueFormatString: "#,##0",
-          xValueFormatString: "MMM YYYY",
-          dataPoints: total
+          xValueFormatString: "DD MMM YYYY",
+          dataPoints: newTotalCases
         },
         {
           type: "line",
           showInLegend: true,
           name: "Indian new Cases",
           yValueFormatString: "#,##0",
-          dataPoints: indian
+          dataPoints: newIndianCases
         },
         {
           type: "line",
           showInLegend: true,
           yValueFormatString: "#,##0",
           name: "Foreigner new cases",
-          dataPoints: foreigner
+          dataPoints: newForeignerCases
         },
         {
           type: "line",
           showInLegend: true,
           yValueFormatString: "#,##0",
           name: "Deaths",
-          dataPoints: death
+          dataPoints: newDeathCases
         },
         {
           type: "line",
           showInLegend: true,
           yValueFormatString: "#,##0",
           name: "Discharged persons",
-          dataPoints: discharged
+          dataPoints: newDischargedCases
         }
         ]
       });
       chart.render();
+
+      // plotting graph for percentage each state contribute in total cases...
+      var chart3 = new CanvasJS.Chart("chartContainer3", {
+        exportEnabled: true,
+        animationEnabled: true,
+        title: {
+          text: "Covid-19 Today statewise Report",
+          fontSize: 22
+        },
+        legend: {
+          cursor: "pointer",
+          fontSize: 14,
+          itemclick: explodePie
+        },
+        data: [{
+          type: "pie",
+          showInLegend: true,
+          toolTipContent: "{name}: <strong>{y}</strong>",
+          indexLabel: "{name} - {y}",
+          dataPoints: todayCases
+        }]
+      });
+      chart3.render();
+
+      // plotting graph for total cases....
+      var chart2 = new CanvasJS.Chart("chartContainer2", {
+        animationEnabled: true,
+        title: {
+          text: "growth in number of covid-19 patient",
+          fontSize: 22
+        },
+        axisY: {
+          includeZero: false,
+          prefix: ""
+        },
+        toolTip: {
+          shared: true
+        },
+        legend: {
+          fontSize: 13
+        },
+        data: [{
+          type: "splineArea",
+          showInLegend: true,
+          name: "Total cases",
+          yValueFormatString: "#,##0",
+          xValueFormatString: "DD MMM YYYY",
+          dataPoints: totalCases
+        },
+        {
+          type: "splineArea",
+          showInLegend: true,
+          name: "Total Deaths case",
+          yValueFormatString: "#,##0",
+          dataPoints: totalDeath
+        }, {
+          type: "splineArea",
+          showInLegend: true,
+          name: "Total Recovered cases",
+          yValueFormatString: "#,##0",
+          dataPoints: totalRecovered
+        },
+        ]
+      });
+      chart2.render();
     })
 }

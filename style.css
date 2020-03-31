@@ -114,6 +114,10 @@ td {
     0 100px 80px rgba(0, 0, 0, 0.12);
 }
 
+.canvasjs-chart-credit {
+  display: none !important;
+}
+
 #india-statewise-cases {
   padding: 10px 40px;
   min-width: 300px;
