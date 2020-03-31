@@ -10,10 +10,15 @@ var svg = d3.select("body").append("svg")
   .attr("width", width)
   .attr("height", height);
 
-var g = svg.append("g");
+var g = svg.append("g"),
+  tooltip = d3
+    .select("#map")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 1);
 
-d3.json("./map.json", function (error, data) {
-
+d3.json("https://raw.githubusercontent.com/Binu42/corona-india/master/map.json", function (error, data) {
+  console.log(data)
   var boundary = centerZoom(data);
   var subunits = drawSubUnits(data);
   colorSubunits(subunits);
