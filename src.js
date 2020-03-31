@@ -258,6 +258,15 @@ window.onload = function () {
       const previousDayReport = response.data.data[response.data.data.length - 2].regional.sort(function (a, b) {
         return b.confirmedCasesIndian - a.confirmedCasesIndian;
       });
+
+      const latestSummary = response.data.data[response.data.data.length - 1].summary;
+      const previousDaySummary = response.data.data[response.data.data.length - 2].summary
+      document.getElementById('india-today-data').innerHTML = `<tr>
+        <td>${latestSummary.total - previousDaySummary.total}</td>
+        <td>${latestSummary.discharged - previousDaySummary.discharged}</td>
+        <td>${latestSummary.deaths - previousDaySummary.deaths}</td>
+      </tr>`
+      console.log(response.data.data[response.data.data.length - 1])
       // console.log(latestReport, previousDayReport);
       latestReport.map((state, index) => {
         const prevDayMatch = previousDayReport.find(statePrev => statePrev.loc === state.loc);
