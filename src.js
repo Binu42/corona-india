@@ -1,4 +1,4 @@
-var width = window.innerWidth - window.innerWidth / 90, height = window.innerHeight;
+var width = window.innerWidth * 0.99, height = window.innerHeight;
 
 var projection = d3.geoMercator();
 
@@ -163,6 +163,8 @@ function colorSubunits(subunits) {
 
 axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewise")
   .then(data => {
+    document.querySelector('.preloader').style.display = 'none';
+    document.querySelector('#page').style.display = 'block';
     var stateData = data.data.data.statewise;
     document.getElementById('updated-at').innerHTML = `<h4 style='text-align: center'>Last updatedAt:- ${moment(data.data.data.lastRefreshed).format('Do MMMM YYYY, h:mm:ss')}</h4>`
     stateData = stateData.sort();
