@@ -28,71 +28,6 @@ d3.json("https://raw.githubusercontent.com/Binu42/corona-india/master/map.json",
 
 });
 
-
-let prevVal = 0,
-  apiResp = null;
-function prev() {
-  populate(++prevVal);
-}
-function nxt() {
-  populate(--prevVal);
-}
-function populate(t) {
-  // $("#nxtBtn").attr("disabled", 0 === t),
-  //   $("#prevBtn").attr("disabled", t === apiResp.data.length - 1);
-  const e = apiResp.data.slice().reverse()[t],
-    {
-      total: a,
-      discharged: s,
-      deaths: n,
-      confirmedCasesForeign: o,
-      confirmedCasesIndian: i
-    } = e.summary;
-  console.log(e.summary)
-  // $("#total_cases").html(a),
-  //   $("#indian_cases").html(i),
-  //   $("#foreign_cases").html(o),
-  //   $("#death_cases").html(n),
-  //   $("#cure_cases").html(s);
-  let r =
-    '<h2 style="color:white;">Indian States Stats</h2><table class="myTable">\n                      <thead>\n                     <tr>\n                      <th>State</td>\n                      <th>Cases</td>\n                      <th>Deaths</td>\n                      <th>Cured</td>\n                      </tr>\n                      </thead>\n                      <tbody>\n                      ';
-  (casesByState = {}),
-    e.regional.forEach(t => {
-      const {
-        confirmedCasesForeign: e,
-        confirmedCasesIndian: a,
-        discharged: s,
-        deaths: n,
-        loc: o
-      } = t;
-      (casesByState[o] = [a, e, n, s]),
-        (r += `<tr><td>${o.replace("Union Territory of ", "")}</td><td>${a +
-          e}</td><td>${n}</td><td>${s}</td></tr>`);
-    }),
-    (r += "</tbody></table>");
-  // $("#table").html(r),
-  // $(".myTable").DataTable({ paging: !1, bFilter: !1, order: [[1, "desc"]] });
-  var l = d3
-    .scaleLinear()
-    .domain([-2, parseInt(45), 75])
-    .range(["#ddd", "#0794DB", "#050D7F"]);
-  d3.json(
-    "https://raw.githubusercontent.com/roshanchokshi/roshanchokshi.github.io/master/map.json",
-    function (t, e) {
-      g.selectAll(".subunit")
-        .data(topojson.feature(e, e.objects.polygons).features)
-        .transition()
-        .duration(700)
-        .style("fill", function (t, e) {
-          const a = t.properties.st_nm;
-          return a in casesByState
-            ? l(casesByState[a][0] + casesByState[a][1])
-            : "#ddd";
-        });
-    }
-  );
-}
-
 function centerZoom(data) {
 
   var o = topojson.mesh(data, data.objects.polygons, function (a, b) { return a === b; });
@@ -228,10 +163,7 @@ function colorSubunits(subunits) {
 
 axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewise")
   .then(data => {
-    console.log(data.data.data.statewise);
     const stateData = data.data.data.statewise;
-    // apiResp = data;
-    // populate();
     stateData.forEach(data => {
       casesByState[data.state] = { confirmed: data.confirmed, recovered: data.recovered, deaths: data.deaths, active: data.active }
     })
