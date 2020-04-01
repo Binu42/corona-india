@@ -11,6 +11,10 @@ path.subunit:hover {
   fill-opacity: 0.4;
 }
 
+#india-states-cases tr:hover {
+  background-color: #d3d3d3;
+}
+
 div.tooltip {
   position: absolute;
   padding: 5px 10px;
@@ -98,9 +102,9 @@ td {
   padding: 10px;
 }
 
-#india-cases {
+#india-cases,
+#india-today-cases {
   margin: 5px 20px;
-
   padding: 10px 40px;
   min-width: 300px;
   max-width: 900px;
@@ -291,5 +295,17 @@ a::after {
   100% {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 500px) {
+  #india-cases,
+  #india-today-cases {
+    margin: 10px 5px;
+    padding: 10px 5px;
+  }
+
+  #india-statewise-cases {
+    padding: 10px 5px;
   }
 }

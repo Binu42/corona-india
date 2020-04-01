@@ -199,6 +199,7 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
     })
     // console.log(stateWiseData)
     document.getElementById('india-states-cases').innerHTML = stateWiseData;
+
     // plotting graph for percentage each state contribute in total cases...
     var chart = new CanvasJS.Chart("chartContainer", {
       exportEnabled: true,
@@ -235,7 +236,8 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
       axisX: {
         labelFontSize: 14,
         interval: 1,
-        labelWrap: true
+        labelAngle: -5,
+        labelAutoFit: true
       },
       toolTip: {
         shared: true
@@ -545,3 +547,4 @@ window.onload = function () {
       chart4.render();
     })
 }
+
