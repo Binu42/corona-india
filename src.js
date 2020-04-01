@@ -223,7 +223,7 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
     });
     chart.render();
 
-    console.log(stateConfirmed, stateDeaths, stateRecovered)
+    // console.log(stateConfirmed, stateDeaths, stateRecovered)
     var chart7 = new CanvasJS.Chart("chartContainer7", {
       animationEnabled: true,
       title: {
@@ -338,7 +338,7 @@ window.onload = function () {
         <td>${latestSummary.discharged - previousDaySummary.discharged}</td>
         <td>${latestSummary.deaths - previousDaySummary.deaths}</td>
       </tr>`
-      console.log(latestReport, previousDayReport);
+      // console.log(latestReport, previousDayReport);
       latestReport.map((state, index) => {
         const prevDayMatch = previousDayReport.find(statePrev => statePrev.loc === state.loc);
         if (index === 0) {
