@@ -341,7 +341,7 @@ window.onload = function () {
       // console.log(latestReport, previousDayReport);
       latestReport.map((state, index) => {
         const prevDayMatch = previousDayReport.find(statePrev => statePrev.loc === state.loc);
-        console.log(prevDayMatch, state.loc)
+        // console.log(prevDayMatch, state.loc)
         if (prevDayMatch !== undefined) {
           if (index === 0) {
             todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)), exploded: true });
