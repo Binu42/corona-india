@@ -175,14 +175,20 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
     <td>${total.recovered}</td>
     <td>${total.deaths}</td>
   </tr>`
-    var stateWiseData = '', report = [];
+    var stateWiseData = '', report = [], stateConfirmed = [], stateDeaths = [], stateRecovered = [];
     stateData.forEach((data, index) => {
       if (index === 0) {
         report.push({ name: data.state, y: Math.round((data.confirmed / total.confirmed) * 100), exploded: true })
       } else {
         report.push({ name: data.state, y: Math.round((data.confirmed / total.confirmed) * 100) })
       }
-      casesByState[data.state] = { confirmed: data.confirmed, recovered: data.recovered, deaths: data.deaths, active: data.active }
+      if (data.confirmed > 0) {
+        casesByState[data.state] = { confirmed: data.confirmed, recovered: data.recovered, deaths: data.deaths, active: data.active }
+        stateConfirmed.push({ label: data.state, y: data.confirmed })
+        stateDeaths.push({ label: data.state, y: data.deaths })
+        stateRecovered.push({ label: data.state, y: data.recovered })
+      }
+
       stateWiseData += `<tr>
       <td>${data.state}</td>
       <td>${data.confirmed}</td>
@@ -198,7 +204,7 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
       exportEnabled: true,
       animationEnabled: true,
       title: {
-        text: "Covid-19 statewise",
+        text: "Covid-19 statewise Patient percentage",
         fontSize: 22
       },
       legend: {
@@ -208,13 +214,77 @@ axios.get("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewi
       },
       data: [{
         type: "pie",
-        showInLegend: true,
+        showInLegend: false,
         toolTipContent: "{name}: <strong>{y}%</strong>",
         indexLabel: "{name} - {y}%",
         dataPoints: report
       }]
     });
     chart.render();
+
+    console.log(stateConfirmed, stateDeaths, stateRecovered)
+    var chart7 = new CanvasJS.Chart("chartContainer7", {
+      animationEnabled: true,
+      title: {
+        text: "COVID-19 State Wise figure",
+        fontSize: 20
+      },
+      axisY: {
+        labelFontSize: 14,
+      },
+      axisX: {
+        labelFontSize: 14,
+        interval: 1,
+        labelWrap: true
+      },
+      toolTip: {
+        shared: true
+      },
+      legend: {
+        cursor: "pointer",
+        itemclick: toggleDataSeries,
+        fontSize: 18,
+      },
+      data: [
+        {
+          type: "stackedBar",
+          name: "confirmed cases",
+          showInLegend: "true",
+          xValueFormatString: "",
+          color: 'blue',
+          yValueFormatString: "#,##0",
+          dataPoints: stateConfirmed
+        },
+        {
+          type: "stackedBar",
+          name: "Deaths cases",
+          showInLegend: "true",
+          xValueFormatString: "",
+          color: 'red',
+          yValueFormatString: "#,##0",
+          dataPoints: stateDeaths
+        },
+        {
+          type: "stackedBar",
+          name: "Recovered cases",
+          showInLegend: "true",
+          color: 'green',
+          xValueFormatString: "",
+          yValueFormatString: "#,##0",
+          dataPoints: stateRecovered
+        }]
+    });
+    chart7.render();
+
+    function toggleDataSeries(e) {
+      if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+        e.dataSeries.visible = false;
+      }
+      else {
+        e.dataSeries.visible = true;
+      }
+      chart7.render();
+    }
   })
 
 
@@ -231,7 +301,7 @@ function explodePie(e) {
 window.onload = function () {
   axios.get('https://api.rootnet.in/covid19-in/stats/daily')
     .then(response => {
-      const newTotalCases = [], newIndianCases = [], newForeignerCases = [], newDeathCases = [], newDischargedCases = [], totalCases = [], totalRecovered = [], totalDeath = [], todayCases = [];
+      const newTotalCases = [], newIndianCases = [], newForeignerCases = [], newDeathCases = [], newDischargedCases = [], totalCases = [], totalRecovered = [], totalDeath = [], todayCases = [], DeathCases = [], RecoveredCases = [];
       response.data.data.map((day, index) => {
         // console.log(index)
         if (index !== 0) {
@@ -266,14 +336,17 @@ window.onload = function () {
         <td>${latestSummary.discharged - previousDaySummary.discharged}</td>
         <td>${latestSummary.deaths - previousDaySummary.deaths}</td>
       </tr>`
-      console.log(response.data.data[response.data.data.length - 1])
-      // console.log(latestReport, previousDayReport);
+      console.log(latestReport, previousDayReport);
       latestReport.map((state, index) => {
         const prevDayMatch = previousDayReport.find(statePrev => statePrev.loc === state.loc);
         if (index === 0) {
-          todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)), exploded: true })
+          todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)), exploded: true });
+          DeathCases.push({ name: state.loc, y: state.deaths, exploded: true });
+          RecoveredCases.push({ name: state.loc, y: state.discharged, exploded: true });
         } else {
           todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)) })
+          DeathCases.push({ name: state.loc, y: state.deaths });
+          RecoveredCases.push({ name: state.loc, y: state.discharged });
         }
       })
       // console.log(todayCases)
@@ -281,12 +354,13 @@ window.onload = function () {
       var chart = new CanvasJS.Chart("chartContainer1", {
         animationEnabled: true,
         title: {
-          text: "Daily Wise New cases in India",
+          text: "Today Newly cases in India",
           fontSize: 22
         },
         axisY: {
           includeZero: false,
-          prefix: ""
+          prefix: "",
+          minimum: -10,
         },
         toolTip: {
           shared: true
@@ -339,8 +413,31 @@ window.onload = function () {
         exportEnabled: true,
         animationEnabled: true,
         title: {
-          text: "Covid-19 Today statewise Report",
+          text: "Covid-19 Today statewise Report newly confirmed cases observed",
           fontSize: 22
+        },
+        legend: {
+          cursor: "pointer",
+          fontSize: 12,
+          itemclick: explodePie
+        },
+        data: [{
+          type: "pie",
+          showInLegend: false,
+          toolTipContent: "{name}: <strong>{y}</strong>",
+          indexLabel: "{name} - {y}",
+          dataPoints: todayCases
+        }]
+      });
+      chart3.render();
+
+      // plotting graph for percentage each state contribute in total cases...
+      var chart5 = new CanvasJS.Chart("chartContainer5", {
+        exportEnabled: true,
+        animationEnabled: true,
+        title: {
+          text: "Covid-19 statewise Total Deaths Report",
+          fontSize: 20
         },
         legend: {
           cursor: "pointer",
@@ -349,19 +446,43 @@ window.onload = function () {
         },
         data: [{
           type: "pie",
-          showInLegend: true,
+          showInLegend: false,
           toolTipContent: "{name}: <strong>{y}</strong>",
           indexLabel: "{name} - {y}",
-          dataPoints: todayCases
+          dataPoints: DeathCases
         }]
       });
-      chart3.render();
+      chart5.render();
+
+
+      // plotting graph for percentage each state contribute in total cases...
+      var chart6 = new CanvasJS.Chart("chartContainer6", {
+        exportEnabled: true,
+        animationEnabled: true,
+        title: {
+          text: "Covid-19 statewise Total Recovered Patient Report",
+          fontSize: 20
+        },
+        legend: {
+          cursor: "pointer",
+          fontSize: 14,
+          itemclick: explodePie
+        },
+        data: [{
+          type: "pie",
+          showInLegend: false,
+          toolTipContent: "{name}: <strong>{y}</strong>",
+          indexLabel: "{name} - {y}",
+          dataPoints: RecoveredCases
+        }]
+      });
+      chart6.render();
 
       // plotting graph for total cases....
       var chart2 = new CanvasJS.Chart("chartContainer2", {
         animationEnabled: true,
         title: {
-          text: "growth in number of covid-19 patient",
+          text: "Total Infected vs. Recovered patients",
           fontSize: 22
         },
         axisY: {
@@ -381,16 +502,10 @@ window.onload = function () {
           yValueFormatString: "#,##0",
           xValueFormatString: "DD MMM YYYY",
           dataPoints: totalCases
-        },
-        {
-          type: "splineArea",
-          showInLegend: true,
-          name: "Total Deaths case",
-          yValueFormatString: "#,##0",
-          dataPoints: totalDeath
         }, {
           type: "splineArea",
           showInLegend: true,
+          color: 'lightgreen',
           name: "Total Recovered cases",
           yValueFormatString: "#,##0",
           dataPoints: totalRecovered
@@ -398,5 +513,35 @@ window.onload = function () {
         ]
       });
       chart2.render();
+
+      // plotting graph for total cases....
+      var chart4 = new CanvasJS.Chart("chartContainer4", {
+        animationEnabled: true,
+        title: {
+          text: "Total Covid-19 patient Death Growth",
+          fontSize: 22
+        },
+        axisY: {
+          includeZero: false,
+          prefix: ""
+        },
+        toolTip: {
+          shared: true
+        },
+        legend: {
+          fontSize: 13
+        },
+        data: [
+          {
+            type: "splineArea",
+            showInLegend: true,
+            name: "Total Deaths case",
+            color: 'red',
+            yValueFormatString: "#,##0",
+            dataPoints: totalDeath
+          }
+        ]
+      });
+      chart4.render();
     })
 }
