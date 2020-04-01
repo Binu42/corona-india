@@ -45,7 +45,9 @@ table {
 .tooltip th,
 .tooltip td,
 #india-cases th,
-#india-cases td {
+#india-cases td,
+#india-today-cases th,
+#india-today-cases td {
   border: none;
   vertical-align: center;
   text-align: center;
