@@ -341,14 +341,17 @@ window.onload = function () {
       // console.log(latestReport, previousDayReport);
       latestReport.map((state, index) => {
         const prevDayMatch = previousDayReport.find(statePrev => statePrev.loc === state.loc);
-        if (index === 0) {
-          todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)), exploded: true });
-          DeathCases.push({ name: state.loc, y: state.deaths, exploded: true });
-          RecoveredCases.push({ name: state.loc, y: state.discharged, exploded: true });
-        } else {
-          todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)) })
-          DeathCases.push({ name: state.loc, y: state.deaths });
-          RecoveredCases.push({ name: state.loc, y: state.discharged });
+        console.log(prevDayMatch, state.loc)
+        if (prevDayMatch !== undefined) {
+          if (index === 0) {
+            todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)), exploded: true });
+            DeathCases.push({ name: state.loc, y: state.deaths, exploded: true });
+            RecoveredCases.push({ name: state.loc, y: state.discharged, exploded: true });
+          } else {
+            todayCases.push({ name: state.loc, y: ((state.confirmedCasesIndian + state.confirmedCasesForeign) - (prevDayMatch.confirmedCasesIndian + prevDayMatch.confirmedCasesForeign)) })
+            DeathCases.push({ name: state.loc, y: state.deaths });
+            RecoveredCases.push({ name: state.loc, y: state.discharged });
+          }
         }
       })
       // console.log(todayCases)
